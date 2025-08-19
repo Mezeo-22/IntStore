@@ -13,7 +13,7 @@ class ProductQueries:
 
     def db_get_all_products(self, skip, limit, where_conditions):
         return self.db.product.find_many(
-            skip=skip, take=limit, where=where_conditions, order={"id": "asc"}
+            skip=skip, take=limit, where=where_conditions, order={"id": "asc"}, include={'category': True}
         )
 
     def db_post_product(self, product):

@@ -36,7 +36,7 @@ class CategoryController:
     async def post_category(self, category: CategoryModel):
         
         errors = self.get_errors_in_category(category)
-        if errors.count > 0:
+        if len(errors) > 0:
             return {"code": 400, "message": errors}
 
         new_category = await self.category_queries.db_post_category(category)
@@ -45,7 +45,7 @@ class CategoryController:
     async def put_category(self, id: int, category: CategoryModel):
 
         errors = self.get_errors_in_category(category)
-        if errors.count > 0:
+        if len(errors) > 0:
             return {"code": 400, "message": errors}
         
         upd_category = await self.category_queries.db_put_category(id, category)

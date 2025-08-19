@@ -14,8 +14,8 @@ async def get_one_product(id: int):
     return await product_controller.get_one_product(id)
 
 @router.get("/")
-async def get_all_products(page: int = Query(1), 
-                           limit: int = Query(10),
+async def get_all_products(page: int = Query(None), 
+                           limit: int = Query(None),
                            categoryId: Optional[int] = Query(None)):
     return await product_controller.get_all_products(page, limit, categoryId)
 

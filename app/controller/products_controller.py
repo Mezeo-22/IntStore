@@ -21,8 +21,11 @@ class ProductController:
         errors = []
         if not isinstance(categoryId, (int)) and categoryId is not None:
             errors.append("Некорректный id категории!")
-        if (not isinstance(page, (int)) and page < 1) or (not isinstance(limit, (int)) and limit < 1):
+        if (not isinstance(page, (int))) or (not isinstance(limit, (int))):
             errors.append("Некорректные параметры страницы!")
+        if isinstance(page, (int)) and isinstance (limit, (int)):
+            if page < 1 and limit < 1:
+                errors.append("Номер страницы и лимит не могут быть равны нулю")
 
         if len(errors) > 0:
             return {"code": 400, "message": errors}
@@ -43,7 +46,7 @@ class ProductController:
     async def post_product(self, product: ProductModel):
         
         errors = self.get_errors_in_product(product)
-        if errors.count > 0:
+        if len(errors) > 0:
             return {"code": 400, "message": errors}
 
         new_product = await self.product_query.db_post_product(product)
@@ -52,7 +55,7 @@ class ProductController:
     async def put_product(self, id: int, product: ProductModel):
 
         errors = self.get_errors_in_product(product)
-        if errors.count > 0:
+        if len(errors) > 0:
             return {"code": 400, "message": errors}
         
         upd_product = await self.product_query.db_put_product(id, product)
