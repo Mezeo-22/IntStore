@@ -1,0 +1,96 @@
+generator client {
+    provider = "prisma-client-py"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id         Int      @id @default(autoincrement())
+    login      String   @unique
+    hash       String   @map("password_hash")
+    role       Role     @default(USER)
+    baskets Basket?
+    orders Order[]
+    reviews Review[]
+}
+
+model Category {
+    id Int @id @default(autoincrement())
+    name String 
+    products Product[]
+}
+
+model Product {
+    id Int @id @default(autoincrement())
+    categoryId Int 
+    name String
+    description String?
+
+    category Category @relation(fields: [categoryId], references: [id], onDelete: NoAction)
+    
+    baskets BasketProducts[]
+    prices Price[]
+    reviews Review[]
+}
+
+model Price {
+    id Int @id @default(autoincrement())
+    productId Int
+    price Float 
+    date DateTime @default(now())
+    product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Basket {
+    id Int @id @default(autoincrement())
+    userId Int @unique
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    products BasketProducts[]
+}
+
+model BasketProducts {
+    basketId Int
+    productId Int
+
+    basket Basket @relation(fields: [basketId], references: [id], onDelete: Cascade)
+    product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    @@id([basketId, productId])
+}
+
+model Order {
+    id Int @id @default(autoincrement())
+    status Status @default(PROCESSING)
+    userId Int
+    CreateDate DateTime @default(now())
+    DeliveryDate DateTime?
+    products Json
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    reviews Review[]
+}
+
+model Review {
+    id Int @id @default(autoincrement())
+    userId Int
+    reviewText String?
+    rating Int @default(1) //1...5
+    orderId Int
+    productId Int
+    user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+    order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+    PROCESSING
+    DELIVERED
+    CANCEL
+}
